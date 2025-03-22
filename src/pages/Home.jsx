@@ -1,19 +1,8 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
 
 const Home = () => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user?.token) {
-      navigate("/chat"); // redirige automáticamente
-    }
-  }, [navigate]);
-
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Header />

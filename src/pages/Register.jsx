@@ -16,27 +16,35 @@ const Register = () => {
 
   const validateField = (name, value) => {
     switch (name) {
-      case "nombre": {
+      case "nombre":
         if (!value.trim()) return "El nombre es requerido";
         break;
-      }
       case "email": {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(value)) return "Email no válido";
         break;
       }
-      case "password": {
+      case "password":
         if (value.length < 6) return "La contraseña debe tener al menos 6 caracteres";
         break;
-      }
-      case "confirmarPassword": {
+      case "confirmarPassword":
         if (value !== formData.password) return "Las contraseñas no coinciden";
         break;
-      }
       default:
         return "";
     }
     return "";
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    Object.keys(formData).forEach((key) => {
+      const error = validateField(key, formData[key]);
+      if (error) newErrors[key] = error;
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
@@ -53,17 +61,6 @@ const Register = () => {
     });
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    Object.keys(formData).forEach((key) => {
-      const error = validateField(key, formData[key]);
-      if (error) newErrors[key] = error;
-    });
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -73,13 +70,14 @@ const Register = () => {
       setMensaje("");
       setErrors({});
 
-      const response = await axios.post(`${API_URL}/api/register`, {
+      await axios.post(`${API_URL}/api/mathregister`, {
         nombre: formData.nombre,
         email: formData.email,
         password: formData.password,
       });
 
       setMensaje("✅ Registro exitoso. Ahora inicia sesión.");
+
       setFormData({
         nombre: "",
         email: "",
