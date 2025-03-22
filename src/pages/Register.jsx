@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import axios from "axios"; // ✅ Importamos axios
-import { API_URL } from "../config"; // ✅ Usamos tu constante de la URL
+import axios from "axios";
+import FormInput from "../components/FormInput";
+import { API_URL } from "../config";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -10,40 +11,75 @@ const Register = () => {
     confirmarPassword: "",
   });
 
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
   const [mensaje, setMensaje] = useState("");
 
-  // Maneja cambios en los campos del formulario
+  const validateField = (name, value) => {
+    switch (name) {
+      case "nombre": {
+        if (!value.trim()) return "El nombre es requerido";
+        break;
+      }
+      case "email": {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) return "Email no válido";
+        break;
+      }
+      case "password": {
+        if (value.length < 6) return "La contraseña debe tener al menos 6 caracteres";
+        break;
+      }
+      case "confirmarPassword": {
+        if (value !== formData.password) return "Las contraseñas no coinciden";
+        break;
+      }
+      default:
+        return "";
+    }
+    return "";
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setFormData({
       ...formData,
       [name]: value,
     });
+
+    setErrors({
+      ...errors,
+      [name]: validateField(name, value),
+    });
   };
 
-  // Envía el formulario al backend
+  const validateForm = () => {
+    const newErrors = {};
+    Object.keys(formData).forEach((key) => {
+      const error = validateField(key, formData[key]);
+      if (error) newErrors[key] = error;
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validación básica
-    if (formData.password !== formData.confirmarPassword) {
-      setError("Las contraseñas no coinciden");
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
-      setError("");
       setMensaje("");
+      setErrors({});
 
-      const response = await axios.post(`${API_URL}/register`, {
+      const response = await axios.post(`${API_URL}/api/register`, {
         nombre: formData.nombre,
         email: formData.email,
         password: formData.password,
       });
 
-      // ✅ Si todo sale bien
-      setMensaje("Registro exitoso. Ahora inicia sesión.");
+      setMensaje("✅ Registro exitoso. Ahora inicia sesión.");
       setFormData({
         nombre: "",
         email: "",
@@ -52,8 +88,8 @@ const Register = () => {
       });
     } catch (err) {
       console.error(err);
-      // ✅ Manejamos errores si el backend devuelve error.response.data
-      setError(err.response?.data?.mensaje || "Error en el registro");
+      const errorMsg = err.response?.data?.mensaje || "Error en el registro";
+      setErrors({ api: errorMsg });
     }
   };
 
@@ -62,69 +98,51 @@ const Register = () => {
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Crear Cuenta</h2>
 
-        {error && <p className="mb-4 text-red-500">{error}</p>}
-        {mensaje && <p className="mb-4 text-green-500">{mensaje}</p>}
+        {errors.api && <p className="mb-4 text-red-500 text-center">{errors.api}</p>}
+        {mensaje && <p className="mb-4 text-green-500 text-center">{mensaje}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
-              Nombre
-            </label>
-            <input
-              type="text"
-              name="nombre"
-              id="nombre"
-              value={formData.nombre}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          <FormInput
+            label="Nombre"
+            name="nombre"
+            value={formData.nombre}
+            onChange={handleChange}
+            placeholder="Tu nombre"
+            error={errors.nombre}
+          />
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          <FormInput
+            label="Email"
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="tucorreo@ejemplo.com"
+            autoComplete="email"
+            error={errors.email}
+          />
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Contraseña
-            </label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          <FormInput
+            label="Contraseña"
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Mínimo 6 caracteres"
+            autoComplete="new-password"
+            error={errors.password}
+          />
 
-          <div>
-            <label htmlFor="confirmarPassword" className="block text-sm font-medium text-gray-700">
-              Confirmar Contraseña
-            </label>
-            <input
-              type="password"
-              name="confirmarPassword"
-              id="confirmarPassword"
-              value={formData.confirmarPassword}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          <FormInput
+            label="Confirmar Contraseña"
+            type="password"
+            name="confirmarPassword"
+            value={formData.confirmarPassword}
+            onChange={handleChange}
+            placeholder="Repite la contraseña"
+            autoComplete="new-password"
+            error={errors.confirmarPassword}
+          />
 
           <button
             type="submit"

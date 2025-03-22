@@ -1,31 +1,42 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import MessageCard from "../components/MessageCard";
+import { API_URL } from "../config";
 
 const Chat = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
-  // Simulación de carga inicial (después reemplazamos con fetch al backend)
   useEffect(() => {
-    setMessages([
-      { id: 1, senderId: "1", senderName: "Admin", content: "Bienvenido a Rapaz Chat!", timestamp: new Date() },
-    ]);
+    const fetchMessages = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/messages`);
+        setMessages(response.data);
+      } catch (err) {
+        console.error("Error al cargar mensajes:", err);
+      }
+    };
+
+    fetchMessages();
   }, []);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!newMessage.trim()) return;
 
     const messageToSend = {
-      id: Date.now(),
       senderId: user.id,
       senderName: user.username,
       content: newMessage,
-      timestamp: new Date(),
     };
 
-    setMessages([...messages, messageToSend]);
-    setNewMessage("");
+    try {
+      const response = await axios.post(`${API_URL}/api/messages`, messageToSend);
+      setMessages([...messages, response.data]);
+      setNewMessage("");
+    } catch (err) {
+      console.error("Error al enviar mensaje:", err);
+    }
   };
 
   return (
