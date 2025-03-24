@@ -70,7 +70,7 @@ const Register = () => {
       setMensaje("");
       setErrors({});
 
-      await axios.post(`${API_URL}/api/mathregister`, {
+      await axios.post(`${API_URL}/api/register`, {
         nombre: formData.nombre,
         email: formData.email,
         password: formData.password,
