@@ -71,11 +71,17 @@ const Register = () => {
     try {
       setErrors({});
 
-      await axios.post(`${API_URL}/api/register`, {
+      const response = await axios.post(`${API_URL}/api/register`, {
         nombre: formData.nombre,
         email: formData.email,
         password: formData.password,
       });
+
+      const { token, user } = response.data; // Suponiendo que el token y el usuario se retornan en la respuesta
+
+      // Guarda el token y el usuario en localStorage
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
       setUsuarioNombre(formData.nombre);
       setRegistroExitoso(true); // Cambiar a true para mostrar la pantalla de bienvenida

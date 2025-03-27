@@ -2,6 +2,7 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
+// Función para verificar si el token ha expirado
 const isTokenExpired = (token) => {
   try {
     const payload = JSON.parse(atob(token.split(".")[1])); // decodifica JWT
@@ -13,12 +14,14 @@ const isTokenExpired = (token) => {
 };
 
 const ProtectedRoute = ({ children, redirectTo = "/login" }) => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const token = localStorage.getItem("token");
 
-  if (!user || !user.token || isTokenExpired(user.token)) {
+  if (!token || isTokenExpired(token)) {
+    // Si no hay token o si el token ha expirado, redirige a login
     return <Navigate to={redirectTo} replace />;
   }
 
+  // Si hay token y no ha expirado, renderiza los componentes hijos
   return children;
 };
 

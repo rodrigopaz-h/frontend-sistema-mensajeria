@@ -12,7 +12,7 @@ const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
-  //Si no hay usuario, redirige al login
+  // Si no hay usuario, redirige al login
   useEffect(() => {
     if (!user || !token) {
       navigate("/login");
@@ -26,7 +26,9 @@ const Chat = () => {
         const response = await axios.get(`${API_URL}/api/messages`, {
           headers: { Authorization: `Bearer ${token}` }, // Token para autenticación
         });
-        setMessages(response.data);
+        if (JSON.stringify(messages) !== JSON.stringify(response.data)) {
+          setMessages(response.data); // Actualiza solo si los mensajes han cambiado
+        }
       } catch (err) {
         console.error("Error al cargar mensajes:", err);
       }
@@ -35,7 +37,7 @@ const Chat = () => {
     fetchMessages();
     const interval = setInterval(fetchMessages, 5000); // Recarga cada 5s
     return () => clearInterval(interval);
-  }, [token]);
+  }, [messages, token]);
 
   const handleSend = async () => {
     if (!newMessage.trim()) return;
@@ -51,7 +53,7 @@ const Chat = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setMessages([...messages, response.data]); // Agrega el nuevo mensaje a la lista
+      setMessages((prevMessages) => [...prevMessages, response.data]); // Agrega el nuevo mensaje a la lista
       setNewMessage("");
     } catch (err) {
       console.error("Error al enviar mensaje:", err);
@@ -89,6 +91,7 @@ const Chat = () => {
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           className="flex-1 border rounded px-4 py-2 focus:outline-none"
+          maxLength={500} // Limita el tamaño del mensaje
         />
         <button onClick={handleSend} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
           Enviar
