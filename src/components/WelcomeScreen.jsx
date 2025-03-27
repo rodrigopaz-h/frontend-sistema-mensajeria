@@ -5,12 +5,24 @@ const WelcomeScreen = ({ user }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      navigate("/chat"); // Redirige a /chat
-    }, 3000); // Redirige en 3 segundos
+    if (user) {
+      const timer = setTimeout(() => {
+        navigate("/chat"); // Redirige a /chat
+      }, 3000); // Redirige en 3 segundos
+      return () => clearTimeout(timer); // Limpia el temporizador al desmontar
+    } else {
+      // Si no hay usuario, redirige al login (por si acaso)
+      navigate("/login");
+    }
+  }, [navigate, user]);
 
-    return () => clearTimeout(timer); // Limpia el temporizador al desmontar
-  }, [navigate]);
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <p>Cargando...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
