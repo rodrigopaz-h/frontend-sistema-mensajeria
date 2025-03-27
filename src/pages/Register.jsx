@@ -71,18 +71,14 @@ const Register = () => {
     try {
       setErrors({});
 
-      const response = await axios.post(`${API_URL}/api/register`, {
+      await axios.post(`${API_URL}/api/register`, {
         nombre: formData.nombre,
         email: formData.email,
         password: formData.password,
       });
 
-      // Guarda el usuario y el token en el localStorage
-      localStorage.setItem("user", JSON.stringify({ id: response.data.id, nombre: response.data.nombre }));
-      localStorage.setItem("token", response.data.token);
-
       setUsuarioNombre(formData.nombre);
-      setRegistroExitoso(true); // Cambia a true para mostrar la pantalla de bienvenida
+      setRegistroExitoso(true); // Cambiar a true para mostrar la pantalla de bienvenida
     } catch (err) {
       console.error(err);
       const errorMsg = err.response?.data?.mensaje || "Error en el registro";
