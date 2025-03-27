@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import FormInput from "../components/FormInput";
 import { API_URL } from "../config";
@@ -14,11 +13,8 @@ const Register = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [mensaje, setMensaje] = useState("");
   const [registroExitoso, setRegistroExitoso] = useState(false);
   const [usuarioNombre, setUsuarioNombre] = useState("");
-
-  const navigate = useNavigate();
 
   const validateField = (name, value) => {
     switch (name) {
@@ -73,7 +69,6 @@ const Register = () => {
     if (!validateForm()) return;
 
     try {
-      setMensaje("");
       setErrors({});
 
       await axios.post(`${API_URL}/api/register`, {
@@ -83,8 +78,7 @@ const Register = () => {
       });
 
       setUsuarioNombre(formData.nombre);
-      setRegistroExitoso(true); // Muestra pantalla de bienvenida
-      setTimeout(() => navigate("/login"), 3000); // Redirige después de 3 segundos
+      setRegistroExitoso(true); // Cambiar a true para mostrar la pantalla de bienvenida
     } catch (err) {
       console.error(err);
       const errorMsg = err.response?.data?.mensaje || "Error en el registro";
@@ -102,7 +96,6 @@ const Register = () => {
         <h2 className="text-2xl font-bold mb-6 text-center">Crear Cuenta</h2>
 
         {errors.api && <p className="mb-4 text-red-500 text-center">{errors.api}</p>}
-        {mensaje && <p className="mb-4 text-green-500 text-center">{mensaje}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <FormInput
@@ -154,13 +147,6 @@ const Register = () => {
             Registrarse
           </button>
         </form>
-
-        <p className="mt-4 text-center text-sm text-gray-600">
-          ¿Ya tienes cuenta?{" "}
-          <a href="/login" className="text-blue-600 hover:underline">
-            Inicia sesión
-          </a>
-        </p>
       </div>
     </div>
   );
