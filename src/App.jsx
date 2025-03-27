@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
@@ -6,6 +5,7 @@ import Login from "./pages/Login";
 import Chat from "./pages/Chat";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import NotFound from "./pages/NotFound"; // Agregar una página 404
 
 const App = () => {
   return (
@@ -24,7 +24,6 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/chat"
           element={
@@ -34,7 +33,8 @@ const App = () => {
           }
         />
 
-        {/* agregar un 404 */}
+        {/* Ruta 404 */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

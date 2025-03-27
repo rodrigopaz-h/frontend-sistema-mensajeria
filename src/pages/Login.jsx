@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import FormInput from "../components/FormInput";
 import { API_URL } from "../config";
@@ -12,6 +13,7 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [mensaje, setMensaje] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const validateField = (name, value) => {
     switch (name) {
@@ -66,20 +68,19 @@ const Login = () => {
 
     try {
       const { email, password } = formData;
-
-      const response = await axios.post(`${API_URL}/api/login`, {
-        email,
-        password,
-      });
+      const response = await axios.post(`${API_URL}/api/login`, { email, password });
 
       setMensaje("✅ Inicio de sesión exitoso");
 
+      localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
 
-      setFormData({
-        email: "",
-        password: "",
-      });
+      setFormData({ email: "", password: "" });
+
+      // Redirige suave al chat después de loguearse correctamente
+      setTimeout(() => {
+        navigate("/chat");
+      }, 1500);
     } catch (err) {
       console.error(err);
       const errorMsg = err.response?.data?.mensaje || "Error en el inicio de sesión";
@@ -133,9 +134,9 @@ const Login = () => {
 
         <p className="mt-4 text-center text-sm text-gray-600">
           ¿No tienes cuenta?{" "}
-          <a href="/register" className="text-blue-600 hover:underline">
+          <Link to="/register" className="text-blue-600 hover:underline">
             Regístrate
-          </a>
+          </Link>
         </p>
       </div>
     </div>

@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import FormInput from "../components/FormInput";
 import { API_URL } from "../config";
+import WelcomeScreen from "../components/WelcomeScreen";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +15,10 @@ const Register = () => {
 
   const [errors, setErrors] = useState({});
   const [mensaje, setMensaje] = useState("");
+  const [registroExitoso, setRegistroExitoso] = useState(false);
+  const [usuarioNombre, setUsuarioNombre] = useState("");
+
+  const navigate = useNavigate();
 
   const validateField = (name, value) => {
     switch (name) {
@@ -76,20 +82,19 @@ const Register = () => {
         password: formData.password,
       });
 
-      setMensaje("✅ Registro exitoso. Ahora inicia sesión.");
-
-      setFormData({
-        nombre: "",
-        email: "",
-        password: "",
-        confirmarPassword: "",
-      });
+      setUsuarioNombre(formData.nombre);
+      setRegistroExitoso(true); // Muestra pantalla de bienvenida
+      setTimeout(() => navigate("/login"), 3000); // Redirige después de 3 segundos
     } catch (err) {
       console.error(err);
       const errorMsg = err.response?.data?.mensaje || "Error en el registro";
       setErrors({ api: errorMsg });
     }
   };
+
+  if (registroExitoso) {
+    return <WelcomeScreen user={usuarioNombre} />;
+  }
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
