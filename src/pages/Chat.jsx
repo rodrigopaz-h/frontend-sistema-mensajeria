@@ -6,37 +6,54 @@ import { API_URL } from "../config";
 
 const Chat = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
-  const token = localStorage.getItem("token");
+
+  // Obtener valores desde localStorage al inicio
+  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("user")));
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
 
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
-  //Si no hay usuario, redirige al login
+  // Si no hay usuario, redirige al login
   useEffect(() => {
     if (!user || !token) {
       navigate("/login");
     }
-  }, [user, token, navigate]);
+  }, [navigate, user, token]);
 
-  // Cargar mensajes al inicio y cada 5 segundos (actualización en tiempo real)
+  // Cargar mensajes al inicio y cada 5 segundos
   useEffect(() => {
+    if (!token) return;
+
     const fetchMessages = async () => {
       try {
         const response = await axios.get(`${API_URL}/api/messages`, {
-          headers: { Authorization: `Bearer ${token}` }, // Token para autenticación
+          headers: { Authorization: `Bearer ${token}` },
         });
         setMessages(response.data);
       } catch (err) {
         console.error("Error al cargar mensajes:", err);
+        if (err.response?.status === 401) {
+          handleLogout(); // Si hay un error 401 (no autorizado), cerrar sesión
+        }
       }
     };
 
     fetchMessages();
-    const interval = setInterval(fetchMessages, 5000); // Recarga cada 5s
+    const interval = setInterval(fetchMessages, 5000);
     return () => clearInterval(interval);
   }, [token]);
 
+  // Manejo de cierre de sesión
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    setUser(null);
+    setToken(null);
+    navigate("/login");
+  };
+
+  // Enviar mensaje
   const handleSend = async () => {
     if (!newMessage.trim()) return;
 
@@ -51,7 +68,7 @@ const Chat = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setMessages([...messages, response.data]); // Agrega el nuevo mensaje a la lista
+      setMessages([...messages, response.data]); // Agregar mensaje
       setNewMessage("");
     } catch (err) {
       console.error("Error al enviar mensaje:", err);
@@ -62,14 +79,7 @@ const Chat = () => {
     <div className="flex flex-col h-screen bg-gray-100">
       <header className="bg-blue-600 text-white py-4 px-6 text-xl font-bold flex justify-between items-center">
         Rapaz Chat
-        <button
-          onClick={() => {
-            localStorage.removeItem("user");
-            localStorage.removeItem("token");
-            navigate("/login");
-          }}
-          className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
-        >
+        <button onClick={handleLogout} className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
           Cerrar sesión
         </button>
       </header>
