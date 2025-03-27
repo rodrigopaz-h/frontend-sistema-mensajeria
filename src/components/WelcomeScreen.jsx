@@ -6,7 +6,7 @@ const WelcomeScreen = ({ user }) => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate("/login");
+      navigate("/chat"); // Redirige a /chat
     }, 3000); // Redirige en 3 segundos
 
     return () => clearTimeout(timer); // Limpia el temporizador al desmontar
@@ -17,7 +17,7 @@ const WelcomeScreen = ({ user }) => {
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md text-center">
         <h2 className="text-2xl font-bold text-green-600">¡Bienvenido, {user}!</h2>
         <p className="mt-4 text-gray-600">Tu cuenta ha sido creada con éxito.</p>
-        <p className="mt-2 text-gray-500">Te redirigiremos al inicio de sesión...</p>
+        <p className="mt-2 text-gray-500">Te redirigiremos al chat...</p>
       </div>
     </div>
   );
