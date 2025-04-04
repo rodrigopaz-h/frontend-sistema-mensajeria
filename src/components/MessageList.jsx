@@ -32,7 +32,7 @@ const MessageList = ({ messages, userId }) => {
               {!isOwnMessage && <p className="font-semibold mb-1 text-xs">{msg.sender_name}</p>}
               <p>{msg.content}</p>
               <span className="block text-[10px] text-right text-gray-400 mt-1">
-                {new Date(msg.timestamp).toLocaleTimeString("es-ES", {
+                {new Date(msg.created_at).toLocaleTimeString("es-ES", {
                   hour: "2-digit",
                   minute: "2-digit",
                 })}
@@ -52,7 +52,7 @@ MessageList.propTypes = {
       sender_id: PropTypes.number.isRequired,
       sender_name: PropTypes.string.isRequired,
       content: PropTypes.string.isRequired,
-      timestamp: PropTypes.string.isRequired,
+      created_at: PropTypes.string.isRequired,
     })
   ).isRequired,
   userId: PropTypes.number.isRequired,

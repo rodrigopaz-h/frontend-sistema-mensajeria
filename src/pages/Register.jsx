@@ -71,6 +71,12 @@ const Register = () => {
     try {
       setErrors({});
 
+      console.log("📤 Enviando datos al backend:", {
+        nombre: formData.nombre,
+        email: formData.email,
+        password: formData.password,
+      });
+
       const response = await axios.post(`${API_URL}/api/register`, {
         nombre: formData.nombre,
         email: formData.email,

@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 const MessageCard = ({ message, userId }) => {
   const isOwnMessage = message.sender_id === userId;
 
-  const formattedTime = new Date(message.timestamp).toLocaleTimeString("es-ES", {
+  const formattedTime = new Date(message.created_at).toLocaleTimeString("es-ES", {
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -32,7 +32,7 @@ MessageCard.propTypes = {
     sender_id: PropTypes.number.isRequired,
     sender_name: PropTypes.string.isRequired,
     content: PropTypes.string.isRequired,
-    timestamp: PropTypes.string.isRequired,
+    created_at: PropTypes.string.isRequired,
   }).isRequired,
   userId: PropTypes.number.isRequired,
 };
